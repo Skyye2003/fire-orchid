@@ -2,7 +2,9 @@ package com.lan.src.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.lan.src.pojo.DiskContent;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface DiskContentMapper extends BaseMapper<DiskContent> {
     int deleteByPrimaryKey(Integer id);
 
