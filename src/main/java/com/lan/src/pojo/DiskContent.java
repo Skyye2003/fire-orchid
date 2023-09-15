@@ -1,13 +1,22 @@
 package com.lan.src.pojo;
 
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+/**
+ * 盘块类
+ */
 @Data
-public class DiskContent {
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName("disk_content")
+public class DiskContent{
     private Integer id;
 
     private Integer status;
 
     private String content;
-
 }
