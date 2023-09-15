@@ -25,10 +25,10 @@ public class FileController {
     private IFileService fileService;
 
     /**
-     * 获取文件列表
+     * 获取根目录下的文件和目录信息
      * @return
      */
-    @GetMapping(value = "/list")
+    @GetMapping(value = "/root")
     public Result<List<FileInfo>> list() {
         List<FileInfo> fileInfoList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
@@ -45,6 +45,9 @@ public class FileController {
             fileInfo.setWriteBnum(0);
             fileInfoList.add(fileInfo);
         }
+        //disk_content里面的前两块盘的content为空，只用于占位
+        //
+        fileService.hi();
         return Result.ok(fileInfoList);
     }
 }
