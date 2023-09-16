@@ -17,6 +17,10 @@ public class DirectoryController {
     @Autowired
     private IDirectoryService directoryService;
 
+    /**
+     * 获取根目录
+     * @return 结果
+     */
     @GetMapping("/root")
     public Result<List<Object>> getRoot(){
         return directoryService.getRoot();
