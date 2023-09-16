@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 盘块类
+ * 盘块类（后端）
  */
 @Data
 @AllArgsConstructor
