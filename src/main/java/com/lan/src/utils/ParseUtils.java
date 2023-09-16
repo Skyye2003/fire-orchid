@@ -5,8 +5,6 @@ import lombok.val;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ParseUtils {
     /**
@@ -36,30 +34,25 @@ public class ParseUtils {
     }
 
     /**
-     *  已切割完毕的登记项
+     *  已切割完毕的登记项进行对象创建、自动赋值
      * @param str 待解析登记项
      * @param clazz 结果类对象
      * @return 结果
      */
     public static Object parseAttribute(String str,Class<?> clazz){
         try {
-            //获取构造方法创建实例
-            Object obj = clazz.getConstructor().newInstance();
-            //切割原字符串，获取 属性名:值 的组合
-            String[] combination = StrUtils.subUnion(str);
+            Object obj = clazz.getConstructor().newInstance();      //获取构造方法创建实例
+            String[] combination = StrUtils.subUnion(str);          //切割原字符串，获取 属性名:值 的组合
             for (String s : combination) {
-                //切割 属性名:值
-                String[] cut = StrUtils.subAttrAndValue(s);
-                //获取属性类型(仅基础类型)
-                Field field = clazz.getDeclaredField(cut[0]);
-                //获取属性类对象
-                Class<?> fieldClass = field.getType();
-                //获取set方法
-                Method method = clazz.getDeclaredMethod("set" + StrUtils.UpperStr(cut[0]), fieldClass);
-                //调用方法
-                method.invoke(obj,handlerFieldType(field,cut[1]));
+                String[] cut = StrUtils.subAttrAndValue(s);         //切割 属性名:值
+                Field field = clazz.getDeclaredField(cut[0]);       //获取属性类型(仅基础类型)
+                Class<?> fieldClass = field.getType();              //获取属性类对象
+                Method method = clazz.getDeclaredMethod(
+                        "set" + StrUtils.UpperStr(cut[0]),
+                        fieldClass);                                //获取set方法
+                method.invoke(obj,handlerFieldType(field,cut[1]));  //调用方法
             }
-            return obj;
+        return obj;                                                 //返回结果
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException |
                  NoSuchFieldException e) {
             throw new RuntimeException(e);
@@ -73,9 +66,8 @@ public class ParseUtils {
      * @return 转换结果
      */
     private static Object handlerFieldType(Field field, String str){
-        //获取类型包名
-        String fieldTypeName = field.getType().getName();
-        return switch (fieldTypeName) {
+        String fieldTypeName = field.getType().getName();   //获取类型包名
+        return switch (fieldTypeName) {                     //判断类型，进行类型转换
             case "java.lang.String" -> str;
             case "java.lang.Integer", "int" -> Integer.parseInt(str);
             default -> null;

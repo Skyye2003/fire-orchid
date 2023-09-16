@@ -29,8 +29,7 @@ public class StrUtils {
      * @return 分割结果
      */
     public static String[] subAttrAndValue(String str){
-        //分割成两段
-        return str.split(":",2);
+        return str.split(":",2);        //分割成两段
     }
 
 
