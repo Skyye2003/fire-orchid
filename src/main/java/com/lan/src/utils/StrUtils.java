@@ -2,7 +2,7 @@ package com.lan.src.utils;
 
 public class StrUtils {
     /**
-     * 切割登记项，格式：属性名1:值1,属性名2:值2...
+     * 切割并重组一条登记项，格式：属性名1:值1/属性名2:值2...
      * @param str 待切割登记项
      * @return 结果
      */
