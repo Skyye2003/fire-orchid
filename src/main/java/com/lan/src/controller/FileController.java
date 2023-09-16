@@ -48,7 +48,6 @@ public class FileController {
         }
         //disk_content里面的前两块盘的content为空，只用于占位
         //
-        fileService.hi();
         return Result.ok(fileInfoList);
     }
 }
