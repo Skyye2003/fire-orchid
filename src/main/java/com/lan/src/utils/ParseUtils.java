@@ -1,5 +1,6 @@
 package com.lan.src.utils;
 
+import com.lan.src.dao.DiskContentMapper;
 import lombok.val;
 
 import java.lang.reflect.Field;
@@ -17,25 +18,8 @@ public class ParseUtils {
     }
 
     /**
-     * 解析登记项
-     * @param str 登记项
-     */
-    public static void parseAttribute(String str, boolean isDirectory){
-        //切割登记项
-        String name = str.substring(0,3);
-        String type = str.substring(3,5);
-        String attribute = String.valueOf(str.charAt(5));
-        String startId = String.valueOf(str.charAt(6));
-        String len = String.valueOf(str.charAt(7));
-        //创建实体类、属性赋值
-        //...
-
-        return;
-    }
-
-    /**
      *  已切割完毕的登记项进行对象创建、自动赋值
-     * @param str 待解析登记项
+     * @param str 待解析字符串
      * @param clazz 结果类对象
      * @return 结果
      */
@@ -43,8 +27,17 @@ public class ParseUtils {
         try {
             Object obj = clazz.getConstructor().newInstance();      //获取构造方法创建实例
             String[] combination = StrUtils.subUnion(str);          //切割原字符串，获取 属性名:值 的组合
+            System.out.println("combination: ");
+            for (String string : combination) {
+                System.out.println(string);
+            }
+            System.out.println();
             for (String s : combination) {
                 String[] cut = StrUtils.subAttrAndValue(s);         //切割 属性名:值
+                System.out.print("cut: ");
+                for (String string : cut) {
+                    System.out.println(string);
+                }
                 Field field = clazz.getDeclaredField(cut[0]);       //获取属性类型(仅基础类型)
                 Class<?> fieldClass = field.getType();              //获取属性类对象
                 Method method = clazz.getDeclaredMethod(
@@ -72,5 +65,18 @@ public class ParseUtils {
             case "java.lang.Integer", "int" -> Integer.parseInt(str);
             default -> null;
         };
+    }
+
+    /**
+     * 搜索空闲盘块
+     * @param dcm Mapper
+     * @return 结果
+     */
+    public static Integer searchEmptyDisk(DiskContentMapper dcm){
+        for (int i = 4; i < 129; i++) {
+            Integer status = dcm.selectByPrimaryKey(i).getStatus();
+            if(status==0) return i;
+        }
+        return null;
     }
 }

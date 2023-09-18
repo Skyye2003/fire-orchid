@@ -1,6 +1,7 @@
 package com.lan.src.controller;
 
 import com.lan.src.dto.RegistryDto;
+import com.lan.src.pojo.DiskContent;
 import com.lan.src.pojo.Result;
 import com.lan.src.service.IDirectoryService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,5 +20,10 @@ public class DirectoryController {
     @PostMapping("/list")
     public Result<List<RegistryDto>> listRegistry(@RequestParam String path){
         return directoryService.listRegistry(path);
+    }
+
+    @PostMapping("/create")
+    public Result<RegistryDto> createDir(@RequestParam String dirName, @RequestParam Integer startId){
+        return directoryService.createDir(dirName,startId);
     }
 }

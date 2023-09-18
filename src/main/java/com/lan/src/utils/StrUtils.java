@@ -10,8 +10,8 @@ public class StrUtils {
         return "name:"+str.substring(0,3)+"/" +
                 "type:"+str.substring(3,5)+"/" +
                 "attribute:"+ str.charAt(5) +"/" +
-                "startId:"+str.charAt(6)+"/" +
-                "len:"+str.charAt(7);
+                "startId:"+str.substring(6,9)+"/" +
+                "len:"+str.substring(9);
     }
 
     /**
@@ -40,5 +40,25 @@ public class StrUtils {
      */
     public static String UpperStr(String str){
         return str.substring(0,1).toUpperCase()+str.substring(1);
+    }
+
+    /**
+     * 填充字符串
+     * @param str 原字符串
+     * @param c 填充物
+     * @param length 填充到多长
+     * @param type 填充模式：false：左填充，true：右填充
+     * @return 结果
+     */
+    public static String fillStr(String str,char c,Integer length,boolean type){
+        StringBuilder strBuilder = new StringBuilder(str);
+        while(strBuilder.length()<length){
+            if(!type)                       //左填充
+                strBuilder.insert(0,c);
+            else                            //右填充
+                strBuilder.append(c);
+        }
+        str = strBuilder.toString();
+        return str;
     }
 }
