@@ -61,4 +61,17 @@ public class StrUtils {
         str = strBuilder.toString();
         return str;
     }
+
+    /**
+     * 生成目录登记项
+     * @param name 目录名
+     * @param startId 起始盘块号
+     * @return 结果
+     * @throws Exception 超出长度
+     */
+    public static String generateDirReg(String name,Integer startId) throws Exception {
+        if (name.length()>3||startId>128)
+            throw new Exception(CodeConstants.DEL_ERROR_OUT_OF_LEN);
+        return fillStr(name,' ',3,false)+"  8"+fillStr(startId.toString(),'0',3,false)+"000";
+    }
 }

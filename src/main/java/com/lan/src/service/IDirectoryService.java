@@ -13,4 +13,6 @@ public interface IDirectoryService {
     Result<List<RegistryDto>> listRegistry(String path);
 
     Result<RegistryDto> createDir(String dirName, Integer startId);
+
+    Result<String> deleteDir(Integer curStartId,String delName,Integer delStartId);
 }

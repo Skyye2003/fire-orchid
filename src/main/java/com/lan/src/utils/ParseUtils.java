@@ -9,17 +9,8 @@ import java.lang.reflect.Method;
 
 public class ParseUtils {
     /**
-     * 判断登记项类别
-     * @param str 登记项
-     * @return 0：文件，1：目录
-     */
-    public static boolean executeType(String str){
-        return "8".equals(String.valueOf(str.charAt(5)));
-    }
-
-    /**
      *  已切割完毕的登记项进行对象创建、自动赋值
-     * @param str 待解析字符串
+     * @param str 待解析字符串 属性名:值/属性名:值...
      * @param clazz 结果类对象
      * @return 结果
      */
