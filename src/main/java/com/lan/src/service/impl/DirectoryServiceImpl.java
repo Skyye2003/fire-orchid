@@ -132,12 +132,11 @@ public class DirectoryServiceImpl implements IDirectoryService {
             if (curDisk == null) {
                 return Result.error("");
             }
-            System.out.println("reg:"+reg);
             String content = curDisk.getContent();
             content = content.replace(reg, "");                                          //修改登记项信息
             content = content.replace("//","/");
             curDisk.setContent(content);
-            delDisk.setStatus(-1);
+            delDisk.setStatus(0);
             delDisk.setContent("0");
             diskContentMapper.updateByPrimaryKey(delDisk);                                             //重置被删除的盘块信息
             diskContentMapper.updateByPrimaryKey(curDisk);                                             //更新当前盘块号信息
