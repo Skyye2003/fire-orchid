@@ -1,6 +1,8 @@
 package com.lan.src.service.impl;
 
 import com.lan.src.dao.DiskContentMapper;
+import com.lan.src.dto.CreDirDTO;
+import com.lan.src.dto.DelDirDTO;
 import com.lan.src.dto.RegistryDto;
 import com.lan.src.pojo.DiskContent;
 import com.lan.src.pojo.Result;
@@ -89,15 +91,16 @@ public class DirectoryServiceImpl implements IDirectoryService {
 
     /**
      * 创建子目录
-     * @param dirName 目录名称
-     * @param startId 当前目录起始盘块号
+     * @param creDirDTO 对象
      * @return 结果
      */
     @Override
-    public Result<RegistryDto> createDir(String dirName,Integer startId) {
+    public Result<RegistryDto> createDir(CreDirDTO creDirDTO) {
+        String dirName = creDirDTO.getDirName();
+        Integer startId = creDirDTO.getStartId();
         if (dirName.length()>3)                                                                  //判断名称是否超出长度要求
             return Result.error(CodeConstants.CREATE_ERROR_NAME_OUT_OF_LEN);
-        dirName = StrUtils.fillStr(dirName,' ',3,false);                           //填充
+        dirName = StrUtils.fillStr(dirName,' ',3,false);                          //填充
         DiskContent curDisk = diskContentMapper.selectByPrimaryKey(startId);                     //获取当前盘块信息
         String content = curDisk.getContent();
         if (content.split("/").length>=8)                                                  //判断是否超过目录项上限
@@ -118,13 +121,14 @@ public class DirectoryServiceImpl implements IDirectoryService {
 
     /**
      * 删除子目录
-     * @param curStartId 当前目录起始盘块号
-     * @param delName 被删除目录的名称
-     * @param delStartId 被删除目录的起始盘块号
+     * @param delDirDTO 对象
      * @return 结果
      */
     @Override
-    public Result<String> deleteDir(Integer curStartId,String delName,Integer delStartId) {
+    public Result<String> deleteDir(DelDirDTO delDirDTO) {
+        Integer delStartId = delDirDTO.getDelStartId();
+        Integer curStartId = delDirDTO.getCurStartId();
+        String delName = delDirDTO.getDelName();
         if (delStartId<=3) return Result.error(CodeConstants.DEL_ERROR_DEL_DENIED);                   //不能被删除的盘块
         DiskContent delDisk = diskContentMapper.selectByPrimaryKey(delStartId);
         if (!"".equals(delDisk.getContent())) return Result.error(CodeConstants.DEL_ERROR_NOT_EMPTY); //登记项不为空

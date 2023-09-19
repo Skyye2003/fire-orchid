@@ -1,14 +1,12 @@
 package com.lan.src.controller;
 
+import com.lan.src.dto.RegistryDto;
 import com.lan.src.pojo.FileInfo;
 import com.lan.src.pojo.Result;
 import com.lan.src.service.IFileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +45,11 @@ public class FileController {
             fileInfoList.add(fileInfo);
         }
         //disk_content里面的前两块盘的content为空，只用于占位
-        //
         return Result.ok(fileInfoList);
+    }
+
+    @PostMapping()
+    public Result<RegistryDto> createFile(){
+        return null;
     }
 }

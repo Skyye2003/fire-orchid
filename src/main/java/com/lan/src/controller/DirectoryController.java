@@ -1,5 +1,7 @@
 package com.lan.src.controller;
 
+import com.lan.src.dto.CreDirDTO;
+import com.lan.src.dto.DelDirDTO;
 import com.lan.src.dto.RegistryDto;
 import com.lan.src.pojo.DiskContent;
 import com.lan.src.pojo.Result;
@@ -18,18 +20,18 @@ public class DirectoryController {
     @Autowired
     private IDirectoryService directoryService;
 
-    @PostMapping("/list")
+    @GetMapping("/list")
     public Result<List<RegistryDto>> listRegistry(@RequestParam String path){
         return directoryService.listRegistry(path);
     }
 
     @PostMapping("/create")
-    public Result<RegistryDto> createDir(@RequestParam String dirName, @RequestParam Integer startId){
-        return directoryService.createDir(dirName,startId);
+    public Result<RegistryDto> createDir(@RequestBody CreDirDTO creDirDTO){
+        return directoryService.createDir(creDirDTO);
     }
 
     @DeleteMapping("/del")
-    public Result<String> deleteDir(@RequestParam Integer curStartId,@RequestParam String delName,@RequestParam Integer delStartId){
-        return directoryService.deleteDir(curStartId,delName,delStartId);
+    public Result<String> deleteDir(@RequestBody DelDirDTO delDirDTO){
+        return directoryService.deleteDir(delDirDTO);
     }
 }
