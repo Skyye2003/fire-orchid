@@ -1,6 +1,8 @@
 package com.lan.src.utils;
 
 import com.lan.src.dao.DiskContentMapper;
+import com.lan.src.pojo.DiskContent;
+import com.lan.src.pojo.Result;
 import lombok.val;
 
 import java.lang.reflect.Field;
@@ -69,5 +71,15 @@ public class ParseUtils {
             if(status==0) return i;
         }
         return null;
+    }
+
+    /**
+     * 检查当前目录是否能保存更多的登记项
+     * @param content 内容
+     * @param dcm Mapper
+     */
+    public static boolean checkRegSize(String content,DiskContentMapper dcm){
+        //判断是否超过目录项上限
+        return content.split("/").length < 8;
     }
 }
