@@ -71,7 +71,17 @@ public class StrUtils {
      */
     public static String generateDirReg(String name,Integer startId) throws Exception {
         if (name.length()>3||startId>128)
-            throw new Exception(CodeConstants.DEL_ERROR_OUT_OF_LEN);
+            throw new Exception();
         return fillStr(name,' ',3,false)+"  8"+fillStr(startId.toString(),'0',3,false)+"000";
+    }
+
+    public static String generateFileReg(String name,String type,Integer attribute,Integer startId) throws Exception {
+        if (name.length()>3||startId>128||attribute>7||type.length()>2|| type.isEmpty())
+            throw new Exception();
+        return fillStr(name,' ',3,false)+           //填充名称
+                fillStr(type,' ',2,false)+          //填充类型
+                attribute+                                         //文件属性
+                fillStr(startId.toString(),'0',3,false)+//填充盘块号
+                "001";                                             //默认长度1
     }
 }

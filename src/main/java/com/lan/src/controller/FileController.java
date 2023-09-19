@@ -1,5 +1,6 @@
 package com.lan.src.controller;
 
+import com.lan.src.dto.CreFileDTO;
 import com.lan.src.dto.RegistryDto;
 import com.lan.src.pojo.FileInfo;
 import com.lan.src.pojo.Result;
@@ -48,8 +49,8 @@ public class FileController {
         return Result.ok(fileInfoList);
     }
 
-    @PostMapping()
-    public Result<RegistryDto> createFile(){
-        return null;
+    @PostMapping("/create")
+    public Result<RegistryDto> createFile(@RequestBody CreFileDTO creFileDTO){
+        return fileService.createFile(creFileDTO);
     }
 }

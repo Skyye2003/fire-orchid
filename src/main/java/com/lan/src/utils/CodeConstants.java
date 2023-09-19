@@ -10,13 +10,17 @@ public class CodeConstants {
      */
     public static final String CREATE_OK = "20010";
     /**
-     * 创建文件名字超出长度限制(length = 3)
+     * 名称/后缀超出长度限制(length = 3)
      */
-    public static final String CREATE_ERROR_NAME_OUT_OF_LEN = "20011: 名称超出长度限制!";
+    public static final String CREATE_ERROR_NAME_OUT_OF_LEN = "20011: 名称/后缀超出长度限制!";
     /**
      * 无空盘块分配
      */
     public static final String CREATE_ERROR_NO_EMPTY = "20012: 无空盘块可分配!";
+    /**
+     * 当前目录登记项个数已满
+     */
+    public static final String CREATE_ERROR_NO_REG = "20013: 当前目录登记项个数已满!";
     /**
      * 删除成功
      */

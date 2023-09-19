@@ -98,22 +98,27 @@ public class DirectoryServiceImpl implements IDirectoryService {
     public Result<RegistryDto> createDir(CreDirDTO creDirDTO) {
         String dirName = creDirDTO.getDirName();
         Integer startId = creDirDTO.getStartId();
+
         if (dirName.length()>3)                                                                  //判断名称是否超出长度要求
             return Result.error(CodeConstants.CREATE_ERROR_NAME_OUT_OF_LEN);
+
         dirName = StrUtils.fillStr(dirName,' ',3,false);                          //填充
         DiskContent curDisk = diskContentMapper.selectByPrimaryKey(startId);                     //获取当前盘块信息
-        String content = curDisk.getContent();
-        if (content.split("/").length>=8)                                                  //判断是否超过目录项上限
-            return Result.error(CodeConstants.CREATE_ERROR_NO_EMPTY);
+
+        if (!ParseUtils.checkRegSize(curDisk.getContent(), diskContentMapper))                   //无法添加新的登记项
+            return Result.error(CodeConstants.CREATE_ERROR_NO_REG);
+
         Integer emptyDiskId = ParseUtils.searchEmptyDisk(diskContentMapper);                     //检索空盘块
+
         if (emptyDiskId == null)                                                                 //无空盘块可用
             return Result.error(CodeConstants.CREATE_ERROR_NO_EMPTY);
+
         String idString = emptyDiskId.toString();
         idString = StrUtils.fillStr(idString,'0',3,false);                        //填充
         String reg = dirName+"  "+"8"+idString+"000";                                            //生成登记项
         RegistryDto result = (RegistryDto)ParseUtils.parseAttribute(
                 StrUtils.subStr(reg), RegistryDto.class);                                        //创建对象
-        curDisk.setContent(content+"/"+reg);
+        curDisk.setContent(curDisk.getContent()+"/"+reg);
         diskContentMapper.updateByPrimaryKey(curDisk);                                           //保存登记项
         diskContentMapper.updateByPrimaryKey(new DiskContent(emptyDiskId,-1,""));  //开辟空盘块
         return Result.ok(result);                                                                //返回新建的目录对象
@@ -129,15 +134,18 @@ public class DirectoryServiceImpl implements IDirectoryService {
         Integer delStartId = delDirDTO.getDelStartId();
         Integer curStartId = delDirDTO.getCurStartId();
         String delName = delDirDTO.getDelName();
-        if (delStartId<=3) return Result.error(CodeConstants.DEL_ERROR_DEL_DENIED);                   //不能被删除的盘块
+        if (delStartId<=3)
+            return Result.error(CodeConstants.DEL_ERROR_DEL_DENIED);                                //不能被删除的盘块
         DiskContent delDisk = diskContentMapper.selectByPrimaryKey(delStartId);
-        if (!"".equals(delDisk.getContent())) return Result.error(CodeConstants.DEL_ERROR_NOT_EMPTY); //登记项不为空
+        if (!"".equals(delDisk.getContent()))
+            return Result.error(CodeConstants.DEL_ERROR_NOT_EMPTY);                                 //登记项不为空
         try {
             String reg = StrUtils.generateDirReg(delName, delStartId);                              //生成登记项
             DiskContent curDisk = diskContentMapper.selectByPrimaryKey(curStartId);                 //获取当前盘块信息
-            if (curDisk == null) {
+
+            if (curDisk == null)
                 return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);
-            }
+
             String content = curDisk.getContent();
             content = content.replace(reg, "");                                          //修改登记项信息
             content = content.replace("//","/");
