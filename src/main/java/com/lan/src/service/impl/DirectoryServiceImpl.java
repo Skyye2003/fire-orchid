@@ -29,26 +29,22 @@ public class DirectoryServiceImpl implements IDirectoryService {
      * @return 结果
      */
     private List<String> getRegistry(Integer id) {
-//        List<String> temp = new ArrayList<>();
         DiskContent diskContent = diskContentMapper.selectByPrimaryKey(id);//查询盘块信息
         String content = diskContent.getContent();                              //获取登记项字符串
         if(content.isEmpty()) return null;
-//        int conLen = content.length(),start = 0,end = 8;
-//        while(start<conLen&&end<conLen){                                        //切割
-//            temp.add(content.substring(start,end));
-//            start+=9;                                                           //指向下一个待切割登记项
-//            end+=9;
-//        }
-//        temp.add(content.substring(start));                                     //处理最后一个带切割登记项
-
         String[] split = content.split("/");                                //切割
         return Arrays.stream(split).map(String::valueOf).collect(Collectors.toList());//转换类型，返回
     }
 
+    /**
+     * 获取指定目录内容
+     * @param path 路径
+     * @return 结果
+     */
     @Override
     public Result<List<RegistryDto>> listRegistry(String path) {
         List<RegistryDto> result = new ArrayList<>();
-        List<String> root = getRegistry(3);                                                 //获取根目录登记项
+        List<String> root = getRegistry(3);                                                     //获取根目录登记项
         if ("/".equals(path)) {
             if (root != null) {
                 for (String reg : root) {
@@ -76,7 +72,7 @@ public class DirectoryServiceImpl implements IDirectoryService {
                     }
                 }
                 if (!flag) {
-                    return Result.error("不存在该目录!");
+                    return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);
                 }
             }
             if(root==null) return Result.ok("empty");
@@ -120,17 +116,23 @@ public class DirectoryServiceImpl implements IDirectoryService {
         return Result.ok(result);                                                                //返回新建的目录对象
     }
 
+    /**
+     * 删除子目录
+     * @param curStartId 当前目录起始盘块号
+     * @param delName 被删除目录的名称
+     * @param delStartId 被删除目录的起始盘块号
+     * @return 结果
+     */
     @Override
     public Result<String> deleteDir(Integer curStartId,String delName,Integer delStartId) {
+        if (delStartId<=3) return Result.error(CodeConstants.DEL_ERROR_DEL_DENIED);                   //不能被删除的盘块
         DiskContent delDisk = diskContentMapper.selectByPrimaryKey(delStartId);
-        if (!"".equals(delDisk.getContent())) {
-            return Result.error(CodeConstants.DEL_ERROR_NOT_EMPTY);
-        }
+        if (!"".equals(delDisk.getContent())) return Result.error(CodeConstants.DEL_ERROR_NOT_EMPTY); //登记项不为空
         try {
             String reg = StrUtils.generateDirReg(delName, delStartId);                              //生成登记项
             DiskContent curDisk = diskContentMapper.selectByPrimaryKey(curStartId);                 //获取当前盘块信息
             if (curDisk == null) {
-                return Result.error("");
+                return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);
             }
             String content = curDisk.getContent();
             content = content.replace(reg, "");                                          //修改登记项信息
@@ -138,10 +140,10 @@ public class DirectoryServiceImpl implements IDirectoryService {
             curDisk.setContent(content);
             delDisk.setStatus(0);
             delDisk.setContent("0");
-            diskContentMapper.updateByPrimaryKey(delDisk);                                             //重置被删除的盘块信息
-            diskContentMapper.updateByPrimaryKey(curDisk);                                             //更新当前盘块号信息
+            diskContentMapper.updateByPrimaryKey(delDisk);                                          //重置被删除的盘块信息
+            diskContentMapper.updateByPrimaryKey(curDisk);                                          //更新当前盘块号信息
         } catch (Exception e) {
-            return Result.error(CodeConstants.DEL_ERROR_OUT_OF_LEN);                                   //名称或起始盘块长度出错
+            return Result.error(CodeConstants.DEL_ERROR_OUT_OF_LEN);                                //名称或起始盘块长度出错
         }
         return Result.ok("删除成功!");
     }
