@@ -137,6 +137,7 @@ public class DirectoryServiceImpl implements IDirectoryService {
             String content = curDisk.getContent();
             content = content.replace(reg, "");                                          //修改登记项信息
             content = content.replace("//","/");
+            if(content.charAt(0)=='/') content = content.substring(1);
             curDisk.setContent(content);
             delDisk.setStatus(0);
             delDisk.setContent("0");

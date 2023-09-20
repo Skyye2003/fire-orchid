@@ -1,6 +1,7 @@
 package com.lan.src.controller;
 
 import com.lan.src.dto.CreFileDTO;
+import com.lan.src.dto.DelFileDTO;
 import com.lan.src.dto.OpenFileDTO;
 import com.lan.src.dto.RegistryDto;
 import com.lan.src.pojo.FileInfo;
@@ -55,9 +56,9 @@ public class FileController {
         return fileService.createFile(creFileDTO);
     }
 
-    @PostMapping("/del")
-    public Result<String> delFile(){
-        return null;
+    @DeleteMapping("/del")
+    public Result<String> delFile(@RequestBody DelFileDTO delFileDTO){
+        return fileService.delFile(delFileDTO);
     }
 
     @PostMapping("/open")

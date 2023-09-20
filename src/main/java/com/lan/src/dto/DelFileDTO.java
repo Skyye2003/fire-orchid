@@ -13,7 +13,7 @@ public class DelFileDTO {
      */
     private Integer delStartId;
     /**
-     * 被删除文件名称
+     * 被删除文件名称(含后缀)
      */
     private String delName;
 }
