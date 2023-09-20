@@ -70,9 +70,6 @@ public class IFileServiceImpl implements IFileService {
     public Result<FileInfo> openFile(OpenFileDTO openFileDTO) {
         String path = openFileDTO.getPath();
         Integer rOrW = openFileDTO.getType();
-        System.out.println();
-        System.out.println("rOrW: "+rOrW);
-        System.out.println();
         path = path.substring(1);                           //切割出除根目录外的路径
         String[] dirs = path.split("/");                        //分割
         String[] dirsCopy = Arrays.copyOfRange(dirs, 0, dirs.length - 1);
