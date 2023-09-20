@@ -37,4 +37,8 @@ public class CodeConstants {
      * 不能删除该目录
      */
     public static final String DEL_ERROR_DEL_DENIED = "30013: 不允许被删除的目录!";
+    /**
+     * 只读文件写打开
+     */
+    public static final String OPEN_ERROR_TYPE = "40011: 只读写打开!";
 }

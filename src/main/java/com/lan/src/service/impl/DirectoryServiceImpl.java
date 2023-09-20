@@ -26,19 +26,6 @@ public class DirectoryServiceImpl implements IDirectoryService {
     private DiskContentMapper diskContentMapper;
 
     /**
-     * 获取指定盘块种的登记项信息
-     * @param id 块号
-     * @return 结果
-     */
-    private List<String> getRegistry(Integer id) {
-        DiskContent diskContent = diskContentMapper.selectByPrimaryKey(id);//查询盘块信息
-        String content = diskContent.getContent();                              //获取登记项字符串
-        if(content.isEmpty()) return null;
-        String[] split = content.split("/");                                //切割
-        return Arrays.stream(split).map(String::valueOf).collect(Collectors.toList());//转换类型，返回
-    }
-
-    /**
      * 获取指定目录内容
      * @param path 路径
      * @return 结果
@@ -46,7 +33,7 @@ public class DirectoryServiceImpl implements IDirectoryService {
     @Override
     public Result<List<RegistryDto>> listRegistry(String path) {
         List<RegistryDto> result = new ArrayList<>();
-        List<String> root = getRegistry(3);                                                     //获取根目录登记项
+        List<String> root = ParseUtils.getRegistry(3,diskContentMapper);                                                     //获取根目录登记项
         if ("/".equals(path)) {
             if (root != null) {
                 for (String reg : root) {
@@ -59,27 +46,28 @@ public class DirectoryServiceImpl implements IDirectoryService {
         }
         else{
             String pathExRoot = path.substring(1);                           //获取除根目录外的路径
-            String[] split = pathExRoot.split("/");                              //切割路径
-            for (String searchPath : split) {                                          //获取需要检索的路径
-                boolean flag = false;
-                if (root != null) {
-                    for (String unit : root) {                                             //获取当前目录内容(登记项)，与需要进行检索的路径进行比较
-                        if ("  ".equals(unit.substring(3, 5)) &&
-                                unit.charAt(5) == '8' &&
-                                unit.substring(0, 3).equals(searchPath)) {                 //搜索到需要的登记项
-                            flag = true;
-                            root = getRegistry(Integer.parseInt(unit.substring(6, 9)));    //获取下一个需要检索的目录
-                            break;
-                        }
-                    }
-                }
-                if (!flag) {
-                    return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);
-                }
-            }
-            if(root==null) return Result.ok("empty");
+            String[] dirs = pathExRoot.split("/");                              //切割路径
+//            for (String searchPath : split) {                                          //获取需要检索的路径
+//                boolean flag = false;
+//                if (root != null) {
+//                    for (String unit : root) {                                             //获取当前目录内容(登记项)，与需要进行检索的路径进行比较
+//                        if ("  8".equals(unit.substring(3, 6))&&
+//                                unit.substring(0, 3).equals(searchPath)) {                 //搜索到需要的登记项
+//                            flag = true;
+//                            root = ParseUtils.getRegistry(Integer.parseInt(unit.substring(6, 9)),diskContentMapper);    //获取下一个需要检索的目录
+//                            break;
+//                        }
+//                    }
+//                }
+//                if (!flag) {
+//                    return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);
+//                }
+//            }
+            List<String> fin = ParseUtils.divePath(root, dirs, diskContentMapper);              //搜索路径
+            if (fin == null) return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);           //未找到目标
+            if(fin.isEmpty()) return Result.ok("empty...");                                //目录为空
             //找到结果，继续操作
-            for (String str : root) {
+            for (String str : fin) {
                 String recast = StrUtils.subStr(str);                                           //切割并重组一条登记项
                 RegistryDto registryDto =
                         (RegistryDto) ParseUtils.parseAttribute(recast, RegistryDto.class);     //解析登记项，生成对象
@@ -149,6 +137,7 @@ public class DirectoryServiceImpl implements IDirectoryService {
             String content = curDisk.getContent();
             content = content.replace(reg, "");                                          //修改登记项信息
             content = content.replace("//","/");
+            if(content.charAt(0)=='/') content = content.substring(1);
             curDisk.setContent(content);
             delDisk.setStatus(0);
             delDisk.setContent("0");
