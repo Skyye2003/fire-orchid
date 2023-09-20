@@ -43,6 +43,24 @@ public class StrUtils {
     }
 
     /**
+     * 简化字符串
+     * @param str 原字符串
+     * @param c 需要排除的字符
+     * @return 结果
+     */
+    public static String remChar(String str,char c){
+        if ("  ".equals(str)) {
+            return str;
+        }
+        StringBuilder strBuilder = new StringBuilder(str);
+        while (!strBuilder.isEmpty() && c == strBuilder.charAt(0)) {
+            strBuilder.deleteCharAt(0);
+        }
+        str = strBuilder.toString();
+        return str;
+    }
+
+    /**
      * 填充字符串
      * @param str 原字符串
      * @param c 填充物
@@ -75,6 +93,15 @@ public class StrUtils {
         return fillStr(name,' ',3,false)+"  8"+fillStr(startId.toString(),'0',3,false)+"000";
     }
 
+    /**
+     * 生成文件目录登记项
+     * @param name 文件名称
+     * @param type 文件后缀
+     * @param attribute 文件属性
+     * @param startId 起始盘块号
+     * @return 结果
+     * @throws Exception 不合规范时(长度超出限制等)抛出异常
+     */
     public static String generateFileReg(String name,String type,Integer attribute,Integer startId) throws Exception {
         if (name.length()>3||startId>128||attribute>7||type.length()>2|| type.isEmpty())
             throw new Exception();
@@ -83,5 +110,25 @@ public class StrUtils {
                 attribute+                                         //文件属性
                 fillStr(startId.toString(),'0',3,false)+//填充盘块号
                 "001";                                             //默认长度1
+    }
+
+    /**
+     * 生成已打开文件表
+     * @param path 路径
+     * @param attribute 属性
+     * @param startIdStr 起始盘块号
+     * @param sizeStr 长度
+     * @param rOrW 读写模式
+     * @return 结果
+     */
+    public static String generateFileInfo(String path,char attribute,String startIdStr,String sizeStr,Integer rOrW){
+        String temp =  "id:"+startIdStr+"/" +
+                "filePath:"+path+"/" +
+                "attribute:"+ attribute+"/" +
+                "startId:"+startIdStr+"/" +
+                "size:"+sizeStr+"/"+
+                "opType:"+rOrW;
+        System.out.println("temp: "+temp);
+        return temp;
     }
 }
