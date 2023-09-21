@@ -2,10 +2,7 @@ package com.lan.src.service.impl;
 
 import com.lan.src.dao.DiskContentMapper;
 import com.lan.src.dao.FileInfoMapper;
-import com.lan.src.dto.CreFileDTO;
-import com.lan.src.dto.DelFileDTO;
-import com.lan.src.dto.OpenFileDTO;
-import com.lan.src.dto.RegistryDto;
+import com.lan.src.dto.*;
 import com.lan.src.pojo.DiskContent;
 import com.lan.src.pojo.FileInfo;
 import com.lan.src.pojo.Result;
@@ -23,10 +20,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 @Service
 @Slf4j
@@ -119,7 +118,7 @@ public class FileServiceImpl implements IFileService {
      * @return 结果
      */
     @Override
-    public Result<FileInfo> openFile(OpenFileDTO openFileDTO) {
+    public Result<FileInfoDTO> openFile(OpenFileDTO openFileDTO) {
         String path = openFileDTO.getPath();
         Integer rOrW = openFileDTO.getType();
         path = path.substring(1);                                         //切割出除根目录外的路径
@@ -136,7 +135,7 @@ public class FileServiceImpl implements IFileService {
         for (String reg : fin) {                                                    //在最后一个目录中搜索目标文件
             if(reg.substring(0,3).equals(StrUtils.fillStr(file[0],' ',3,false))&&
                     reg.substring(3,5).equals(StrUtils.fillStr(file[1],' ',2,false))){
-                target = reg;                           //找到目标登记项
+                target = reg;                                                      //找到目标登记项
                 break;
             }
         }
@@ -144,18 +143,19 @@ public class FileServiceImpl implements IFileService {
         if (target.isEmpty())
             return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);                //找不到目标
 
-        FileInfo fileInfo;
-        //填写已打开文件表
         if (Integer.parseInt(target.substring(5,6))%2==1&&rOrW==1)                  //判断为只读文件
-                return Result.error(CodeConstants.OPEN_ERROR_TYPE);                 //只读文件写打开错误
+            return Result.error(CodeConstants.OPEN_ERROR_TYPE);                     //只读文件写打开错误
 
-        fileInfo = (FileInfo)ParseUtils.parseAttribute(
-                StrUtils.generateFileInfo(path,target.charAt(5),target.substring(6,9),target.substring(9),rOrW),
-                FileInfo.class);
-        ObjectHandler.handlePoint(fileInfo, diskContentMapper);
-        fileInfoMapper.insert(fileInfo);
-        //返回已打开文件表对象
-        return Result.ok(fileInfo);
+        FileInfo fileInfo = fileInfoMapper.selectByPrimaryKey(Integer.parseInt(target.substring(6, 9)));
+        if (fileInfo == null) {
+            //填写已打开文件表
+            fileInfo = (FileInfo)ParseUtils.parseAttribute(
+                    StrUtils.generateFileInfo(path,target.charAt(5),target.substring(6,9),target.substring(9),rOrW),
+                    FileInfo.class);
+            ObjectHandler.handlePoint(fileInfo, diskContentMapper);
+            fileInfoMapper.insert(fileInfo);                                            //保存打开文件表到数据库
+        }
+        return Result.ok(new FileInfoDTO(fileInfo,handleContent(fileInfo)));        //返回已打开文件表对象
     }
 
     /**
@@ -180,13 +180,6 @@ public class FileServiceImpl implements IFileService {
 
         fileInfoMapper.deleteByPrimaryKey(delStartId);                              //删除对应的已打开文件表
 
-        //获取当前类的代理对象并赋值给proxy
-        /*
-          AopContext中存在一个ThreadLocal类管理当前线程使用的对象
-          其中存放着代理对象
-         */
-//        proxy = (FileServiceImpl) AopContext.currentProxy();
-
         DiskContent curDisk = diskContentMapper.selectByPrimaryKey(curStartId);
         String curDiskContent = curDisk.getContent();
         String[] cut = delName.split("\\.");                    //分割名称、后缀
@@ -203,5 +196,23 @@ public class FileServiceImpl implements IFileService {
         }
         //未找到
         return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);
+    }
+
+    /**
+     * 获取文件内容
+     * @param fileInfo 打开文件表对象
+     * @return 结果
+     */
+    private String handleContent(FileInfo fileInfo){
+        Integer startId = fileInfo.getStartId();
+        DiskContent diskContent = diskContentMapper.selectByPrimaryKey(startId);
+        Integer status = diskContent.getStatus();
+        StringBuilder result = new StringBuilder(diskContent.getContent());
+        while(status!=-1){                                                  //未到最后一个盘块
+            diskContent = diskContentMapper.selectByPrimaryKey(status);     //定位下一个盘块
+            result.append(diskContent.getContent());                        //添加下一个盘块的内容
+            status = diskContent.getStatus();                               //转至下一个盘块
+        }
+        return result.toString();                                           //返回结果
     }
 }

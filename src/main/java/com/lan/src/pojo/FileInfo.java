@@ -53,6 +53,4 @@ public class FileInfo {
      * 写文件在磁盘第几字节
      */
     private Integer writeBnum;
-
-
 }

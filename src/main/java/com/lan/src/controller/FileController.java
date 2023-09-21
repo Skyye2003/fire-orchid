@@ -1,9 +1,6 @@
 package com.lan.src.controller;
 
-import com.lan.src.dto.CreFileDTO;
-import com.lan.src.dto.DelFileDTO;
-import com.lan.src.dto.OpenFileDTO;
-import com.lan.src.dto.RegistryDto;
+import com.lan.src.dto.*;
 import com.lan.src.pojo.FileInfo;
 import com.lan.src.pojo.Result;
 import com.lan.src.service.IFileService;
@@ -62,7 +59,7 @@ public class FileController {
     }
 
     @PostMapping("/open")
-    public Result<FileInfo> openFile(@RequestBody OpenFileDTO openFileDTO){
+    public Result<FileInfoDTO> openFile(@RequestBody OpenFileDTO openFileDTO){
         return fileService.openFile(openFileDTO);
     }
 }
