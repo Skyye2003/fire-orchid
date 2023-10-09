@@ -24,6 +24,16 @@ public class StrUtils {
     }
 
     /**
+     * 分割各个属性名:值
+     * @param str 原字符串
+     * @param cutStr 分割字符串
+     * @return 分割结果
+     */
+    public static String[] subUnion(String str,String cutStr){
+        return str.split(cutStr);
+    }
+
+    /**
      * 分割各个属性名 值
      * @param str 原字符串
      * @return 分割结果
@@ -122,11 +132,11 @@ public class StrUtils {
      * @return 结果
      */
     public static String generateFileInfo(String path,char attribute,String startIdStr,String sizeStr,Integer rOrW){
-        String temp =  "id:"+startIdStr+"/" +
-                "filePath:"+path+"/" +
-                "attribute:"+ attribute+"/" +
-                "startId:"+startIdStr+"/" +
-                "size:"+sizeStr+"/"+
+        String temp =  "id:"+startIdStr+"//" +
+                "filePath:"+path+"//" +
+                "attribute:"+ attribute+"//" +
+                "startId:"+startIdStr+"//" +
+                "size:"+sizeStr+"//"+
                 "opType:"+rOrW;
         System.out.println("temp: "+temp);
         return temp;

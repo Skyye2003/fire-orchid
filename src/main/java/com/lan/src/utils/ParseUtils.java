@@ -37,7 +37,7 @@ public class ParseUtils {
     public static Object parseAttribute(String str,Class<?> clazz){
         try {
             Object obj = clazz.getConstructor().newInstance();      //获取构造方法创建实例
-            String[] combination = StrUtils.subUnion(str);          //切割原字符串，获取 属性名:值 的组合
+            String[] combination = StrUtils.subUnion(str,"//");          //切割原字符串，获取 属性名:值 的组合
             for (String s : combination) {
                 String[] cut = StrUtils.subAttrAndValue(s);         //切割 属性名:值
                 Field field = clazz.getDeclaredField(cut[0]);       //获取属性类型(仅基础类型)
