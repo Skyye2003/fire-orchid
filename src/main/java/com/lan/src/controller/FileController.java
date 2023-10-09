@@ -49,7 +49,7 @@ public class FileController {
     }
 
     @PostMapping("/create")
-    public Result<RegistryDto> createFile(@RequestBody CreFileDTO creFileDTO){
+    public Result<RegistryDTO> createFile(@RequestBody CreFileDTO creFileDTO){
         return fileService.createFile(creFileDTO);
     }
 

@@ -4,7 +4,7 @@ import com.lan.src.dao.DiskContentMapper;
 import com.lan.src.dto.CreDirDTO;
 import com.lan.src.dto.DelDirDTO;
 import com.lan.src.dto.DirContentDTO;
-import com.lan.src.dto.RegistryDto;
+import com.lan.src.dto.RegistryDTO;
 import com.lan.src.pojo.DiskContent;
 import com.lan.src.pojo.Result;
 import com.lan.src.service.IDirectoryService;
@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -34,15 +32,15 @@ public class DirectoryServiceImpl implements IDirectoryService {
     @Override
     public Result<DirContentDTO> listRegistry(String path) {
         DirContentDTO result = new DirContentDTO();
-        List<RegistryDto> list = new ArrayList<>();
+        List<RegistryDTO> list = new ArrayList<>();
         List<String> root = ParseUtils.getRegistry(3,diskContentMapper);                                                     //获取根目录登记项
         if ("/".equals(path)) {
             result.curDirStartId = 3;
             if (root != null) {
                 for (String reg : root) {
                     String recast = StrUtils.subStr(reg);                                           //切割并重组一条登记项
-                    RegistryDto registryDto =
-                            (RegistryDto) ParseUtils.parseAttribute(recast, RegistryDto.class);     //解析登记项，生成对象
+                    RegistryDTO registryDto =
+                            (RegistryDTO) ParseUtils.parseAttribute(recast, RegistryDTO.class);     //解析登记项，生成对象
                     list.add(registryDto);                                                        //加入结果列表
                 }
             }
@@ -75,8 +73,8 @@ public class DirectoryServiceImpl implements IDirectoryService {
             //找到结果，继续操作
             for (String str : fin) {
                 String recast = StrUtils.subStr(str);                                           //切割并重组一条登记项
-                RegistryDto registryDto =
-                        (RegistryDto) ParseUtils.parseAttribute(recast, RegistryDto.class);     //解析登记项，生成对象
+                RegistryDTO registryDto =
+                        (RegistryDTO) ParseUtils.parseAttribute(recast, RegistryDTO.class);     //解析登记项，生成对象
                 list.add(registryDto);                                                        //加入结果列表
             }
         }
@@ -90,7 +88,7 @@ public class DirectoryServiceImpl implements IDirectoryService {
      * @return 结果
      */
     @Override
-    public Result<RegistryDto> createDir(CreDirDTO creDirDTO) {
+    public Result<RegistryDTO> createDir(CreDirDTO creDirDTO) {
         String dirName = creDirDTO.getDirName();
         Integer startId = creDirDTO.getStartId();
 
@@ -111,8 +109,8 @@ public class DirectoryServiceImpl implements IDirectoryService {
         String idString = emptyDiskId.toString();
         idString = StrUtils.fillStr(idString,'0',3,false);                        //填充
         String reg = dirName+"  "+"8"+idString+"000";                                            //生成登记项
-        RegistryDto result = (RegistryDto)ParseUtils.parseAttribute(
-                StrUtils.subStr(reg), RegistryDto.class);                                        //创建对象
+        RegistryDTO result = (RegistryDTO)ParseUtils.parseAttribute(
+                StrUtils.subStr(reg), RegistryDTO.class);                                        //创建对象
         curDisk.setContent(curDisk.getContent()+"/"+reg);
         diskContentMapper.updateByPrimaryKey(curDisk);                                           //保存登记项
         diskContentMapper.updateByPrimaryKey(new DiskContent(emptyDiskId,-1,""));  //开辟空盘块

@@ -13,19 +13,16 @@ import com.lan.src.utils.ParseUtils;
 import com.lan.src.utils.StrUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 @Service
 @Slf4j
@@ -84,7 +81,7 @@ public class FileServiceImpl implements IFileService {
      * @return 结果
      */
     @Override
-    public Result<RegistryDto> createFile(CreFileDTO creFileDTO) {
+    public Result<RegistryDTO> createFile(CreFileDTO creFileDTO) {
         Integer curStartId = creFileDTO.getCurStartId();
         String fileName = creFileDTO.getFileName();
         String type = creFileDTO.getType();
@@ -103,8 +100,8 @@ public class FileServiceImpl implements IFileService {
             String reg = StrUtils.generateFileReg(fileName, type, attribute, emptyDiskId);           //生成登记项
             curDisk.setContent(curDisk.getContent()+'/'+reg);
             diskContentMapper.updateByPrimaryKey(curDisk);                                           //更新盘块登记项
-            RegistryDto result = (RegistryDto)ParseUtils.parseAttribute(
-                    StrUtils.subStr(reg), RegistryDto.class);                                        //创建对象
+            RegistryDTO result = (RegistryDTO)ParseUtils.parseAttribute(
+                    StrUtils.subStr(reg), RegistryDTO.class);                                        //创建对象
             diskContentMapper.updateByPrimaryKey(new DiskContent(emptyDiskId,-1,""));  //开辟空盘块
             return Result.ok(result);
         } catch (Exception e) {

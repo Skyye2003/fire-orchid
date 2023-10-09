@@ -7,10 +7,10 @@ public class StrUtils {
      * @return 结果
      */
     public static String subStr(String str){
-        return "name:"+str.substring(0,3)+"/" +
-                "type:"+str.substring(3,5)+"/" +
-                "attribute:"+ str.charAt(5) +"/" +
-                "startId:"+str.substring(6,9)+"/" +
+        return "name:"+str.substring(0,3)+"//" +
+                "type:"+str.substring(3,5)+"//" +
+                "attribute:"+ str.charAt(5) +"//" +
+                "startId:"+str.substring(6,9)+"//" +
                 "len:"+str.substring(9);
     }
 
