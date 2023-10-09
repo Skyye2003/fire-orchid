@@ -3,6 +3,7 @@ package com.lan.src.service.impl;
 import com.lan.src.dao.DiskContentMapper;
 import com.lan.src.dto.CreDirDTO;
 import com.lan.src.dto.DelDirDTO;
+import com.lan.src.dto.DirContentDTO;
 import com.lan.src.dto.RegistryDto;
 import com.lan.src.pojo.DiskContent;
 import com.lan.src.pojo.Result;
@@ -31,22 +32,24 @@ public class DirectoryServiceImpl implements IDirectoryService {
      * @return 结果
      */
     @Override
-    public Result<List<RegistryDto>> listRegistry(String path) {
-        List<RegistryDto> result = new ArrayList<>();
+    public Result<DirContentDTO> listRegistry(String path) {
+        DirContentDTO result = new DirContentDTO();
+        List<RegistryDto> list = new ArrayList<>();
         List<String> root = ParseUtils.getRegistry(3,diskContentMapper);                                                     //获取根目录登记项
         if ("/".equals(path)) {
+            result.curDirStartId = 3;
             if (root != null) {
                 for (String reg : root) {
                     String recast = StrUtils.subStr(reg);                                           //切割并重组一条登记项
                     RegistryDto registryDto =
                             (RegistryDto) ParseUtils.parseAttribute(recast, RegistryDto.class);     //解析登记项，生成对象
-                    result.add(registryDto);                                                        //加入结果列表
+                    list.add(registryDto);                                                        //加入结果列表
                 }
             }
         }
         else{
             String pathExRoot = path.substring(1);                           //获取除根目录外的路径
-            String[] dirs = pathExRoot.split("/");                              //切割路径
+            String[] dirs = pathExRoot.split("/");                               //切割路径
 //            for (String searchPath : split) {                                          //获取需要检索的路径
 //                boolean flag = false;
 //                if (root != null) {
@@ -64,6 +67,8 @@ public class DirectoryServiceImpl implements IDirectoryService {
 //                }
 //            }
             List<String> fin = ParseUtils.divePath(root, dirs, diskContentMapper);              //搜索路径
+            result.curDirStartId = Integer.valueOf(fin.get(fin.size()-1));
+            fin.remove(fin.size()-1);
             if (fin == null) return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);           //未找到目标
             if(fin.isEmpty()) return Result.ok("empty...");                                //目录为空
             //找到结果，继续操作
@@ -71,9 +76,10 @@ public class DirectoryServiceImpl implements IDirectoryService {
                 String recast = StrUtils.subStr(str);                                           //切割并重组一条登记项
                 RegistryDto registryDto =
                         (RegistryDto) ParseUtils.parseAttribute(recast, RegistryDto.class);     //解析登记项，生成对象
-                result.add(registryDto);                                                        //加入结果列表
+                list.add(registryDto);                                                        //加入结果列表
             }
         }
+        result.list = list;
         return Result.ok(result);
     }
 

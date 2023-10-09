@@ -2,6 +2,7 @@ package com.lan.src.service;
 
 import com.lan.src.dto.CreDirDTO;
 import com.lan.src.dto.DelDirDTO;
+import com.lan.src.dto.DirContentDTO;
 import com.lan.src.dto.RegistryDto;
 import com.lan.src.pojo.DiskContent;
 import com.lan.src.pojo.Result;
@@ -12,7 +13,7 @@ import java.util.List;
 @Transactional
 public interface IDirectoryService {
 
-    Result<List<RegistryDto>> listRegistry(String path);
+    Result<DirContentDTO> listRegistry(String path);
 
     Result<RegistryDto> createDir(CreDirDTO creDirDTO);
 
