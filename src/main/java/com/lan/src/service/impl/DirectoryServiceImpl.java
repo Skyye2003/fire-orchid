@@ -67,9 +67,10 @@ public class DirectoryServiceImpl implements IDirectoryService {
 //                }
 //            }
             List<String> fin = ParseUtils.divePath(root, dirs, diskContentMapper);              //搜索路径
+            if (fin == null) return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);           //未找到目标
             result.curDirStartId = Integer.valueOf(fin.get(fin.size()-1));
             fin.remove(fin.size()-1);
-            if (fin == null) return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);           //未找到目标
+
             if(fin.isEmpty()) return Result.ok("empty...");                                //目录为空
             //找到结果，继续操作
             for (String str : fin) {
