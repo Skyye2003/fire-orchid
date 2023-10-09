@@ -126,11 +126,14 @@ public class FileServiceImpl implements IFileService {
         String[] dirsCopy = Arrays.copyOfRange(dirs, 0, dirs.length - 1);
         List<String> root = ParseUtils.getRegistry(3, diskContentMapper);        //获取根目录内的登记项
         List<String> fin = ParseUtils.divePath(root, dirsCopy, diskContentMapper);
+        if(fin == null){                                                            //不存在对应路径
+            return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET+":路径");
+        }
         fin.remove(fin.size()-1);
         String[] file = dirs[dirs.length-1].split("\\.");                     //切割名称和后缀
 
-        if (fin == null|| fin.isEmpty())
-            return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);                //找不到目标
+        if (fin.isEmpty())
+            return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET+":路径");                //找不到目标
 
         String target = "";
         for (String reg : fin) {                                                    //在最后一个目录中搜索目标文件
@@ -142,7 +145,7 @@ public class FileServiceImpl implements IFileService {
         }
 
         if (target.isEmpty())
-            return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET);                //找不到目标
+            return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET+":文件");                //找不到目标
 
         if (Integer.parseInt(target.substring(5,6))%2==1&&rOrW==1)                  //判断为只读文件
             return Result.error(CodeConstants.OPEN_ERROR_TYPE);                     //只读文件写打开错误

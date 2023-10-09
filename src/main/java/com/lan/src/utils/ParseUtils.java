@@ -106,10 +106,10 @@ public class ParseUtils {
             boolean flag = false;
             for (String reg : root) {                                                               //遍历每个登记项，判断是否存在目标目录
                 if (dir.equals(reg.substring(0,3))&&
-                        "  8".equals(reg.substring(3,6))) {                                         //存在
+                        "  8".equals(reg.substring(3,6))) {                                         //存在目标
                     flag = true;
                     root = getRegistry(Integer.parseInt(reg.substring(6,9)),diskContentMapper);     //获取下一个目录的登记项内容
-                    System.out.println("reg: "+reg);
+                    if(root==null) root = new ArrayList<>();
                     root.add((reg.substring(6,9)));
                     break;
                 }
