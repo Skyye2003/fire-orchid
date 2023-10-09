@@ -2,6 +2,7 @@ package com.lan.src.controller;
 
 import com.lan.src.dto.CreDirDTO;
 import com.lan.src.dto.DelDirDTO;
+import com.lan.src.dto.DirContentDTO;
 import com.lan.src.dto.RegistryDto;
 import com.lan.src.pojo.DiskContent;
 import com.lan.src.pojo.Result;
@@ -21,7 +22,7 @@ public class DirectoryController {
     private IDirectoryService directoryService;
 
     @GetMapping("/list")
-    public Result<List<RegistryDto>> listRegistry(@RequestParam String path){
+    public Result<DirContentDTO> listRegistry(@RequestParam String path){
         return directoryService.listRegistry(path);
     }
 

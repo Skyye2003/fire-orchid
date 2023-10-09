@@ -126,6 +126,7 @@ public class FileServiceImpl implements IFileService {
         String[] dirsCopy = Arrays.copyOfRange(dirs, 0, dirs.length - 1);
         List<String> root = ParseUtils.getRegistry(3, diskContentMapper);        //获取根目录内的登记项
         List<String> fin = ParseUtils.divePath(root, dirsCopy, diskContentMapper);
+        fin.remove(fin.size()-1);
         String[] file = dirs[dirs.length-1].split("\\.");                     //切割名称和后缀
 
         if (fin == null|| fin.isEmpty())

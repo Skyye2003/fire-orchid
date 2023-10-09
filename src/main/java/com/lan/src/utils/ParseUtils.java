@@ -104,12 +104,13 @@ public class ParseUtils {
         }
         for (String dir : dirs) {                                                                   //按顺序搜索目录
             boolean flag = false;
-            assert root != null;
             for (String reg : root) {                                                               //遍历每个登记项，判断是否存在目标目录
                 if (dir.equals(reg.substring(0,3))&&
-                        "  8".equals(reg.substring(3,6))) {
+                        "  8".equals(reg.substring(3,6))) {                                         //存在
                     flag = true;
                     root = getRegistry(Integer.parseInt(reg.substring(6,9)),diskContentMapper);     //获取下一个目录的登记项内容
+                    System.out.println("reg: "+reg);
+                    root.add((reg.substring(6,9)));
                     break;
                 }
             }
@@ -118,6 +119,7 @@ public class ParseUtils {
                 return null;
         }
         //处理目录为空
+        //为空返回空列表，否则返回root
         return Objects.requireNonNullElseGet(root, ArrayList::new);
     }
 }
