@@ -3,16 +3,12 @@ package com.lan.src.controller;
 import com.lan.src.dto.CreDirDTO;
 import com.lan.src.dto.DelDirDTO;
 import com.lan.src.dto.DirContentDTO;
-import com.lan.src.dto.RegistryDto;
-import com.lan.src.pojo.DiskContent;
+import com.lan.src.dto.RegistryDTO;
 import com.lan.src.pojo.Result;
 import com.lan.src.service.IDirectoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.lang.runtime.ObjectMethods;
-import java.util.List;
 
 @RestController
 @RequestMapping("/dir")
@@ -27,7 +23,7 @@ public class DirectoryController {
     }
 
     @PostMapping("/create")
-    public Result<RegistryDto> createDir(@RequestBody CreDirDTO creDirDTO){
+    public Result<RegistryDTO> createDir(@RequestBody CreDirDTO creDirDTO){
         return directoryService.createDir(creDirDTO);
     }
 

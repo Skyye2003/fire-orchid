@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistryDto {
+public class RegistryDTO {
     /**
      * 名称
      */
