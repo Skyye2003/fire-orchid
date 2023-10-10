@@ -119,8 +119,8 @@ public class FileServiceImpl implements IFileService {
         String path = openFileDTO.getPath();
         Integer rOrW = openFileDTO.getType();
         path = path.substring(1);                                         //切割出除根目录外的路径
-        String[] dirs = path.split("/");                                      //分割
-        String[] dirsCopy = Arrays.copyOfRange(dirs, 0, dirs.length - 1);
+        String[] dirs = path.split("/");                                      //分割目录名
+        String[] dirsCopy = Arrays.copyOfRange(dirs, 0, dirs.length - 1);  //复制
         List<String> root = ParseUtils.getRegistry(3, diskContentMapper);        //获取根目录内的登记项
         List<String> fin = ParseUtils.divePath(root, dirsCopy, diskContentMapper);
         if(fin == null){                                                            //不存在对应路径
@@ -130,17 +130,20 @@ public class FileServiceImpl implements IFileService {
         String[] file = dirs[dirs.length-1].split("\\.");                     //切割名称和后缀
 
         if (fin.isEmpty())
-            return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET+":路径");                //找不到目标
+            return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET+":路径");    //找不到目标
+
+        System.out.println("fin: "+fin);
 
         String target = "";
         for (String reg : fin) {                                                    //在最后一个目录中搜索目标文件
             if(reg.substring(0,3).equals(StrUtils.fillStr(file[0],' ',3,false))&&
                     reg.substring(3,5).equals(StrUtils.fillStr(file[1],' ',2,false))){
-                target = reg;                                                      //找到目标登记项
+                target = reg;                                                       //找到目标登记项
                 break;
             }
         }
 
+        //未找到登记项
         if (target.isEmpty())
             return Result.error(CodeConstants.ERROR_NO_SUCH_TARGET+":文件");                //找不到目标
 
