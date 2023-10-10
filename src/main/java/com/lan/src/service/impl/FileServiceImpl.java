@@ -53,6 +53,7 @@ public class FileServiceImpl implements IFileService {
                 try {
                     //获取阻塞队列中的信息
                     List<Integer> clear = clearTasks.take();
+                    System.out.println("get it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+clear.get(0));
                     //代理对象执行清空操作
                     clearDisk(clear);
                 } catch (InterruptedException e) {
@@ -175,22 +176,20 @@ public class FileServiceImpl implements IFileService {
         String delName = delFileDTO.getDelName();
         Integer status = diskContentMapper.selectByPrimaryKey(delStartId).getStatus();
 
-
-        clearTasks.add(clearDisk);                                                  //加入到删除任务，等待删除
-
-        fileInfoMapper.deleteByPrimaryKey(delStartId);                              //删除对应的已打开文件表
-
         DiskContent curDisk = diskContentMapper.selectByPrimaryKey(curStartId);
         String curDiskContent = curDisk.getContent();
         String[] cut = delName.split("\\.");                    //分割名称、后缀
         String[] contentSplit = curDiskContent.split("/");      //分割出各个登记项
         for (String content : contentSplit) {                         //搜索匹配的登记项
             if (content.substring(0,5).equals(cut[0]+cut[1])) {       //找到
-                clearDisk.add(delStartId);                                                  //加入盘块清空任务
+                fileInfoMapper.deleteByPrimaryKey(delStartId);                              //删除对应的已打开文件表
+
+                clearDisk.add(delStartId);                                                  //加入盘块清空列表
                 while(status!=-1){                                                          //查找所有需要删除的盘块号
                     clearDisk.add(status);                                                  //加入待删除列表
                     status = diskContentMapper.selectByPrimaryKey(status).getStatus();
                 }
+                clearTasks.add(clearDisk);                                                  //加入到删除任务，等待删除
 
                 curDiskContent = curDiskContent.replace(content, "");
                 curDiskContent = curDiskContent.replace("//","/");

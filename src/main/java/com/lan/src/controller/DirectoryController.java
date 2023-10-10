@@ -27,7 +27,7 @@ public class DirectoryController {
         return directoryService.createDir(creDirDTO);
     }
 
-    @DeleteMapping("/del")
+    @PostMapping("/del")
     public Result<String> deleteDir(@RequestBody DelDirDTO delDirDTO){
         return directoryService.deleteDir(delDirDTO);
     }

@@ -53,7 +53,7 @@ public class FileController {
         return fileService.createFile(creFileDTO);
     }
 
-    @DeleteMapping("/del")
+    @PostMapping("/del")
     public Result<String> delFile(@RequestBody DelFileDTO delFileDTO){
         return fileService.delFile(delFileDTO);
     }
