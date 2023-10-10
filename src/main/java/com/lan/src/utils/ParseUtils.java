@@ -2,8 +2,6 @@ package com.lan.src.utils;
 
 import com.lan.src.dao.DiskContentMapper;
 import com.lan.src.pojo.DiskContent;
-import com.lan.src.pojo.Result;
-import lombok.val;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
