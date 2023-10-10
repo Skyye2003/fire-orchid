@@ -93,7 +93,7 @@ public class ParseUtils {
     }
 
     /**
-     * 搜索目录
+     * 搜索目标目录
      * @param root 根目录登记项List
      * @param dirs 除根目录外已经切割好的各个目录名称
      * @return 存在：返回最终目录登记项集合，否则返回null
@@ -103,14 +103,18 @@ public class ParseUtils {
             return new ArrayList<>();
         }
         for (String dir : dirs) {                                                                   //按顺序搜索目录
+            dir = StrUtils.fillStr(dir, ' ', 3, false);                              //填充长度短于3的目录名称
             boolean flag = false;
             for (String reg : root) {                                                               //遍历每个登记项，判断是否存在目标目录
                 if (dir.equals(reg.substring(0,3))&&
                         "  8".equals(reg.substring(3,6))) {                                         //存在目标
                     flag = true;
                     root = getRegistry(Integer.parseInt(reg.substring(6,9)),diskContentMapper);     //获取下一个目录的登记项内容
+
                     if(root==null) root = new ArrayList<>();
-                    root.add((reg.substring(6,9)));
+
+
+                    root.add((reg.substring(6,9)));                                                 //补充当前目录盘块号
                     break;
                 }
             }
@@ -118,6 +122,7 @@ public class ParseUtils {
             if (!flag)                                                                              //不存在
                 return null;
         }
+        if(dirs.length==0) root.add("003");
         //处理目录为空
         //为空返回空列表，否则返回root
         return Objects.requireNonNullElseGet(root, ArrayList::new);
