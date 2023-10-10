@@ -174,11 +174,7 @@ public class FileServiceImpl implements IFileService {
         Integer curStartId = delFileDTO.getCurStartId();
         String delName = delFileDTO.getDelName();
         Integer status = diskContentMapper.selectByPrimaryKey(delStartId).getStatus();
-        clearDisk.add(delStartId);
-        while(status!=-1){                                                          //查找所有需要删除的盘块号
-            clearDisk.add(status);                                                  //加入待删除列表
-            status = diskContentMapper.selectByPrimaryKey(status).getStatus();
-        }
+
 
         clearTasks.add(clearDisk);                                                  //加入到删除任务，等待删除
 
@@ -190,9 +186,18 @@ public class FileServiceImpl implements IFileService {
         String[] contentSplit = curDiskContent.split("/");      //分割出各个登记项
         for (String content : contentSplit) {                         //搜索匹配的登记项
             if (content.substring(0,5).equals(cut[0]+cut[1])) {       //找到
+                clearDisk.add(delStartId);                                                  //加入盘块清空任务
+                while(status!=-1){                                                          //查找所有需要删除的盘块号
+                    clearDisk.add(status);                                                  //加入待删除列表
+                    status = diskContentMapper.selectByPrimaryKey(status).getStatus();
+                }
+
                 curDiskContent = curDiskContent.replace(content, "");
                 curDiskContent = curDiskContent.replace("//","/");
+                //清除头'/'
                 if(curDiskContent.charAt(0)=='/') curDiskContent = curDiskContent.substring(1);
+                //清除尾'/'
+                if(curDiskContent.charAt(curDiskContent.length()-1)=='/') curDiskContent = curDiskContent.substring(0,curDiskContent.length()-1);
                 curDisk.setContent(curDiskContent);
                 diskContentMapper.updateByPrimaryKey(curDisk);        //更新
                 return Result.ok("删除成功!");
