@@ -70,13 +70,13 @@ public class DirectoryServiceImpl implements IDirectoryService {
             result.curDirStartId = Integer.valueOf(fin.get(fin.size()-1));
             fin.remove(fin.size()-1);
 
-            if(fin.isEmpty()) return Result.ok("empty...");                                //目录为空
+            if(fin.isEmpty()) return Result.ok(result);                                //目录为空
             //找到结果，继续操作
             for (String str : fin) {
                 String recast = StrUtils.subStr(str);                                           //切割并重组一条登记项
                 RegistryDTO registryDto =
                         (RegistryDTO) ParseUtils.parseAttribute(recast, RegistryDTO.class);     //解析登记项，生成对象
-                list.add(registryDto);                                                        //加入结果列表
+                list.add(registryDto);                                                          //加入结果列表
             }
         }
         result.list = list;
