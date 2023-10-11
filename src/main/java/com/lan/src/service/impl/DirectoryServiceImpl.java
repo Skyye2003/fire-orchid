@@ -112,7 +112,10 @@ public class DirectoryServiceImpl implements IDirectoryService {
         String reg = dirName+"  "+"8"+idString+"000";                                            //生成登记项
         RegistryDTO result = (RegistryDTO)ParseUtils.parseAttribute(
                 StrUtils.subStr(reg), RegistryDTO.class);                                        //创建对象
-        curDisk.setContent(curDisk.getContent()+"/"+reg);
+
+        if("".equals(curDisk.getContent())) curDisk.setContent(reg);
+        else curDisk.setContent(curDisk.getContent()+"/"+reg);
+
         diskContentMapper.updateByPrimaryKey(curDisk);                                           //保存登记项
         diskContentMapper.updateByPrimaryKey(new DiskContent(emptyDiskId,-1,""));  //开辟空盘块
         return Result.ok(result);                                                                //返回新建的目录对象
@@ -143,8 +146,10 @@ public class DirectoryServiceImpl implements IDirectoryService {
             String content = curDisk.getContent();
             content = content.replace(reg, "");                                          //修改登记项信息
             content = content.replace("//","/");
-            if(content.charAt(0)=='/') content = content.substring(1);
-            if(content.charAt(content.length()-1)=='/') content = content.substring(0,content.length()-1);
+            if(!content.isEmpty()){
+                if(content.charAt(0)=='/') content = content.substring(1);
+                if(content.charAt(content.length()-1)=='/') content = content.substring(0,content.length()-1);
+            }
             curDisk.setContent(content);
             delDisk.setStatus(0);
             delDisk.setContent("0");

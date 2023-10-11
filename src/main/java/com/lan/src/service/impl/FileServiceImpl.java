@@ -53,7 +53,7 @@ public class FileServiceImpl implements IFileService {
                 try {
                     //获取阻塞队列中的信息
                     List<Integer> clear = clearTasks.take();
-                    System.out.println("get it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+clear.get(0));
+//                    System.out.println("get it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+clear.get(0));
                     //代理对象执行清空操作
                     clearDisk(clear);
                 } catch (InterruptedException e) {
@@ -99,7 +99,10 @@ public class FileServiceImpl implements IFileService {
                 return Result.error(CodeConstants.CREATE_ERROR_NO_EMPTY);                            //无空盘块可用
 
             String reg = StrUtils.generateFileReg(fileName, type, attribute, emptyDiskId);           //生成登记项
-            curDisk.setContent(curDisk.getContent()+'/'+reg);
+
+            if("".equals(curDisk.getContent())) curDisk.setContent(reg);
+            else curDisk.setContent(curDisk.getContent()+'/'+reg);
+
             diskContentMapper.updateByPrimaryKey(curDisk);                                           //更新盘块登记项
             RegistryDTO result = (RegistryDTO)ParseUtils.parseAttribute(
                     StrUtils.subStr(reg), RegistryDTO.class);                                        //创建对象
@@ -179,9 +182,11 @@ public class FileServiceImpl implements IFileService {
         DiskContent curDisk = diskContentMapper.selectByPrimaryKey(curStartId);
         String curDiskContent = curDisk.getContent();
         String[] cut = delName.split("\\.");                    //分割名称、后缀
+        cut[0] = StrUtils.fillStr(cut[0],' ',3,false); //填充名称
+        cut[1] = StrUtils.fillStr(cut[1],' ',2,false); //填充后缀
         String[] contentSplit = curDiskContent.split("/");      //分割出各个登记项
         for (String content : contentSplit) {                         //搜索匹配的登记项
-            if (content.substring(0,5).equals(cut[0]+cut[1])) {       //找到
+            if (content.substring(0,5).equals(cut[0] + cut[1])) {       //找到
                 fileInfoMapper.deleteByPrimaryKey(delStartId);                              //删除对应的已打开文件表
 
                 clearDisk.add(delStartId);                                                  //加入盘块清空列表
@@ -193,10 +198,12 @@ public class FileServiceImpl implements IFileService {
 
                 curDiskContent = curDiskContent.replace(content, "");
                 curDiskContent = curDiskContent.replace("//","/");
-                //清除头'/'
-                if(curDiskContent.charAt(0)=='/') curDiskContent = curDiskContent.substring(1);
-                //清除尾'/'
-                if(curDiskContent.charAt(curDiskContent.length()-1)=='/') curDiskContent = curDiskContent.substring(0,curDiskContent.length()-1);
+                if(!curDiskContent.isEmpty()){
+                    //清除头'/'
+                    if(curDiskContent.charAt(0)=='/') curDiskContent = curDiskContent.substring(1);
+                    //清除尾'/'
+                    if(curDiskContent.charAt(curDiskContent.length()-1)=='/') curDiskContent = curDiskContent.substring(0,curDiskContent.length()-1);
+                }
                 curDisk.setContent(curDiskContent);
                 diskContentMapper.updateByPrimaryKey(curDisk);        //更新
                 return Result.ok("删除成功!");
