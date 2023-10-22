@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,5 +62,10 @@ public class FileController {
     @PostMapping("/open")
     public Result<FileInfoDTO> openFile(@RequestBody OpenFileDTO openFileDTO){
         return fileService.openFile(openFileDTO);
+    }
+
+    @PostMapping("/write")
+    public Result<FileInfoDTO> writeFile(@RequestBody FileInfo fileInfo, @RequestParam ByteBuffer byteBuffer){
+        return fileService.writeFile(fileInfo, byteBuffer);
     }
 }
