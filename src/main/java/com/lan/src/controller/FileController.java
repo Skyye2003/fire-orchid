@@ -25,7 +25,7 @@ public class FileController {
 
     /**
      * 获取根目录下的文件和目录信息
-     * @return
+     * @return 结果
      */
     @GetMapping(value = "/root")
     public Result<List<FileInfo>> list() {
