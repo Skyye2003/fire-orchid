@@ -234,7 +234,7 @@ public class FileServiceImpl implements IFileService {
 
     /**
      * 写文件
-     * @param fileId 文件id
+     * @param fileId 写文件id
      * @param data 需要写入的数据
      * @return
      */
@@ -243,7 +243,7 @@ public class FileServiceImpl implements IFileService {
         Integer currentBlock = fileInfo.getWriteDnum(); //获取写文件的盘块号
         Integer writePointer = fileInfo.getWriteBnum(); //获取文件的写指针位置（当前磁盘的第几字节）
         Integer fileLength = fileInfo.getSize(); // 获取文件当前长度（占用的磁盘块数）
-        DiskContent diskContent = diskContentMapper.selectByPrimaryKey(currentBlock); //从当前盘块号开始追加数据
+        DiskContent diskContent = diskContentMapper.selectByPrimaryKey(currentBlock);
         String content = diskContent.getContent(); //获取当前盘块的内容
 
         // 检查是否有足够的空间写入数据
@@ -258,9 +258,13 @@ public class FileServiceImpl implements IFileService {
             diskContentMapper.updateByPrimaryKey(diskContent);
             // 更新当前盘块内容
             diskContent = diskContentMapper.selectByPrimaryKey(newBlock);
+            // 更新当前盘块的状态为-1
+            diskContent.setStatus(-1);
             content = data;
             // 更新文件长度（占用的盘块数）
             fileInfo.setSize(fileLength + 1);
+            // 更新文件写指针盘块
+            fileInfo.setWriteDnum(newBlock);
             // 更新文件写指针位置
             fileInfo.setWriteBnum(data.length());
         } else {
