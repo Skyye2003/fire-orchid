@@ -232,20 +232,25 @@ public class FileServiceImpl implements IFileService {
         return result.toString();                                           //返回结果
     }
 
-    public Result<FileInfoDTO> writeFile(FileInfo fileInfo, ByteBuffer byteBuffer) {
-        int currentBlock = fileInfo.getWriteDnum(); //获取写文件的盘块号
-        int writePointer = fileInfo.getWriteBnum(); //获取文件的写指针位置（当前磁盘的第几字节）
-        int fileLength = fileInfo.getSize(); // 获取文件当前长度（占用的磁盘块数）
+    /**
+     * 写文件
+     * @param fileId 文件id
+     * @param data 需要写入的数据
+     * @return
+     */
+    public Result<FileInfoDTO> writeFile(Integer fileId, String data) {
+        FileInfo fileInfo = fileInfoMapper.selectByPrimaryKey(fileId); //根据文件id获取fileInfo
+        Integer currentBlock = fileInfo.getWriteDnum(); //获取写文件的盘块号
+        Integer writePointer = fileInfo.getWriteBnum(); //获取文件的写指针位置（当前磁盘的第几字节）
+        Integer fileLength = fileInfo.getSize(); // 获取文件当前长度（占用的磁盘块数）
         DiskContent diskContent = diskContentMapper.selectByPrimaryKey(currentBlock); //从当前盘块号开始追加数据
         String content = diskContent.getContent(); //获取当前盘块的内容
-        byte[] data = new byte[byteBuffer.remaining()]; // 将byteBuffer中的数据存储到data中
-        byteBuffer.get(data);
 
         // 检查是否有足够的空间写入数据
-        if (currentBlock != -1 && writePointer + data.length > 64){
+        if (currentBlock != -1 && writePointer + data.length() > 64){
             // 如果当前盘块已满，创建一个新的盘块
-            int newBlock = ParseUtils.searchEmptyDisk(diskContentMapper);
-            if (newBlock == -1) {
+            Integer newBlock = ParseUtils.searchEmptyDisk(diskContentMapper);
+            if (newBlock == null) {
                 return Result.error(CodeConstants.CREATE_ERROR_NO_EMPTY); //磁盘空间不足
             }
             // 更新当前盘块的状态，指向新的盘块
@@ -253,15 +258,15 @@ public class FileServiceImpl implements IFileService {
             diskContentMapper.updateByPrimaryKey(diskContent);
             // 更新当前盘块内容
             diskContent = diskContentMapper.selectByPrimaryKey(newBlock);
-            content = new String(data);
+            content = data;
             // 更新文件长度（占用的盘块数）
             fileInfo.setSize(fileLength + 1);
             // 更新文件写指针位置
-            fileInfo.setWriteBnum(data.length);
+            fileInfo.setWriteBnum(data.length());
         } else {
             // 向当前盘块追加数据
-            content += new String(data);
-            fileInfo.setWriteBnum(writePointer + data.length);
+            content += data;
+            fileInfo.setWriteBnum(writePointer + data.length());
         }
 
         // 更新盘块的内容

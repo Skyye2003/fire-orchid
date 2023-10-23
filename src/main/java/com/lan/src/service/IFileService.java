@@ -15,5 +15,5 @@ public interface IFileService {
 
     Result<String> delFile(DelFileDTO delFileDTO);
 
-    Result<FileInfoDTO> writeFile(FileInfo fileInfo, ByteBuffer byteBuffer);
+    Result<FileInfoDTO> writeFile(Integer fileId, String data);
 }
