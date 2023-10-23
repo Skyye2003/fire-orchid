@@ -64,8 +64,8 @@ public class FileController {
         return fileService.openFile(openFileDTO);
     }
 
-    @PostMapping("/write")
-    public Result<FileInfoDTO> writeFile(@RequestBody FileInfo fileInfo, @RequestParam ByteBuffer byteBuffer){
-        return fileService.writeFile(fileInfo, byteBuffer);
+    @PostMapping("/write/{fileId}/{data}")
+    public Result<FileInfoDTO> writeFile(@PathVariable Integer fileId, @PathVariable String data){
+        return fileService.writeFile(fileId, data);
     }
 }
