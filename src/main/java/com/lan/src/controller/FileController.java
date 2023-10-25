@@ -64,9 +64,9 @@ public class FileController {
         return fileService.openFile(openFileDTO);
     }
 
-    @PostMapping("/write/{fileId}/{data}")
-    public Result<FileInfoDTO> writeFile(@PathVariable Integer fileId, @PathVariable String data){
-        return fileService.writeFile(fileId, data);
+    @PostMapping("/write")
+    public Result<FileInfoDTO> writeFile(@RequestBody WriteFileDTO writeFileDTO){
+        return fileService.writeFile(writeFileDTO);
     }
 
     @PostMapping("/change")
