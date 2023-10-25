@@ -232,13 +232,10 @@ public class FileServiceImpl implements IFileService {
         return result.toString();                                           //返回结果
     }
 
-    /**
-     * 写文件
-     * @param fileId 写文件id
-     * @param data 需要写入的数据
-     * @return 结果
-     */
-    public Result<FileInfoDTO> writeFile(Integer fileId, String data) {
+
+    public Result<FileInfoDTO> writeFile(WriteFileDTO writeFileDTO) {
+        Integer fileId = writeFileDTO.getFileId();
+        String data = writeFileDTO.getData();
         FileInfo fileInfo = fileInfoMapper.selectByPrimaryKey(fileId); //根据文件id获取fileInfo
         Integer currentBlock = fileInfo.getWriteDnum(); //获取写文件的盘块号
         Integer writePointer = fileInfo.getWriteBnum(); //获取文件的写指针位置（当前磁盘的第几字节）
