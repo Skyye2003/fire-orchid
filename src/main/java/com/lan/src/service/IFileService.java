@@ -16,4 +16,6 @@ public interface IFileService {
     Result<String> delFile(DelFileDTO delFileDTO);
 
     Result<FileInfoDTO> writeFile(Integer fileId, String data);
+
+    Result<RegistryDTO> change(ChangeFileDTO changeFileDTO);
 }

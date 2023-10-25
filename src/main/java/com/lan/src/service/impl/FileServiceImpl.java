@@ -236,48 +236,107 @@ public class FileServiceImpl implements IFileService {
      * 写文件
      * @param fileId 写文件id
      * @param data 需要写入的数据
-     * @return
+     * @return 结果
      */
     public Result<FileInfoDTO> writeFile(Integer fileId, String data) {
         FileInfo fileInfo = fileInfoMapper.selectByPrimaryKey(fileId); //根据文件id获取fileInfo
         Integer currentBlock = fileInfo.getWriteDnum(); //获取写文件的盘块号
         Integer writePointer = fileInfo.getWriteBnum(); //获取文件的写指针位置（当前磁盘的第几字节）
-        Integer fileLength = fileInfo.getSize(); // 获取文件当前长度（占用的磁盘块数）
+        Integer fileLength = fileInfo.getSize(); //获取文件当前长度（占用的磁盘块数）
         DiskContent diskContent = diskContentMapper.selectByPrimaryKey(currentBlock);
         String content = diskContent.getContent(); //获取当前盘块的内容
 
-        // 检查是否有足够的空间写入数据
+        //检查是否有足够的空间写入数据
         if (currentBlock != -1 && writePointer + data.length() > 64){
-            // 如果当前盘块已满，创建一个新的盘块
+            //如果当前盘块已满，创建一个新的盘块
             Integer newBlock = ParseUtils.searchEmptyDisk(diskContentMapper);
             if (newBlock == null) {
                 return Result.error(CodeConstants.CREATE_ERROR_NO_EMPTY); //磁盘空间不足
             }
-            // 更新当前盘块的状态，指向新的盘块
+            //更新当前盘块的状态，指向新的盘块
             diskContent.setStatus(newBlock);
             diskContentMapper.updateByPrimaryKey(diskContent);
-            // 更新当前盘块内容
+            //更新当前盘块内容
             diskContent = diskContentMapper.selectByPrimaryKey(newBlock);
-            // 更新当前盘块的状态为-1
+            //更新当前盘块的状态为-1
             diskContent.setStatus(-1);
             content = data;
-            // 更新文件长度（占用的盘块数）
+            //更新文件长度（占用的盘块数）
             fileInfo.setSize(fileLength + 1);
-            // 更新文件写指针盘块
+            //更新文件写指针盘块
             fileInfo.setWriteDnum(newBlock);
-            // 更新文件写指针位置
+            //更新文件写指针位置
             fileInfo.setWriteBnum(data.length());
         } else {
-            // 向当前盘块追加数据
+            //向当前盘块追加数据
             content += data;
             fileInfo.setWriteBnum(writePointer + data.length());
         }
 
-        // 更新盘块的内容
+        //更新盘块的内容
         diskContent.setContent(content);
         diskContentMapper.updateByPrimaryKey(diskContent);
-        // 更新文件信息
+        //更新文件信息
         fileInfoMapper.updateByPrimaryKey(fileInfo);
         return Result.ok(new FileInfoDTO(fileInfo, handleContent(fileInfo)));
+    }
+
+    /**
+     * 更改文件的属性
+     * @param changeFileDTO 更改的文件对象
+     * @return 结果
+     */
+    public Result<RegistryDTO> change (ChangeFileDTO changeFileDTO) {
+        Integer curDiskId = changeFileDTO.getCurDiskId(); //当前文件的目录盘块号
+        Integer curFileId = changeFileDTO.getCurFileId(); //当前文件盘块号
+        String oldName = changeFileDTO.getOldName();
+        String newName = changeFileDTO.getNewName();
+        String type = changeFileDTO.getType();
+        Integer attribute = changeFileDTO.getAttribute();
+        FileInfo fileInfo = fileInfoMapper.selectByPrimaryKey(curFileId); //根据文件id获取fileInfo
+
+        DiskContent curDisk = diskContentMapper.selectByPrimaryKey(curDiskId); //获取当前盘块
+        String curDiskContent = curDisk.getContent(); //当前盘块内容
+        String[] contentSplit = curDiskContent.split("/"); //分割出各个登记项
+
+        String[] change = oldName.split("\\."); //分割名称、后缀
+        change[0] = StrUtils.fillStr(change[0],' ',3,false); //填充名称
+        change[1] = StrUtils.fillStr(change[1],' ',2,false); //填充后缀
+
+        try {
+            String reg = StrUtils.generateFileReg(newName, type, attribute, curDiskId); //生成更改后的登记项
+            String newContent = "";
+            for (String content : contentSplit) { //搜索匹配的登记项
+                if (content.substring(0,5).equals(change[0] + change[1])) { //匹配到则替换为新的登记项
+                    if (newContent.isEmpty()) {
+                        newContent += reg;
+                    } else {
+                        newContent += '/' + reg;
+                    }
+                } else {
+                    if (newContent.isEmpty()) {
+                        newContent += content;
+                    } else {
+                        newContent += '/' + content;
+                    }
+                }
+            }
+
+            String oldFilePath = fileInfo.getFilePath();
+            String[] parts = oldFilePath.split("/"); //使用"/"进行分割
+            String newFilePath = String.join("/", Arrays.copyOf(parts, parts.length - 1)) + "/" + newName + "." + type; //将原路径的文件名更新为新文件名
+            fileInfo.setFilePath(newFilePath);
+            fileInfo.setAttribute(attribute.toString()); //更新文件属性
+            fileInfoMapper.updateByPrimaryKey(fileInfo);
+
+            curDisk.setContent(newContent);
+            diskContentMapper.updateByPrimaryKey(curDisk); //更新盘块登记项
+
+            RegistryDTO result = (RegistryDTO)ParseUtils.parseAttribute(
+                    StrUtils.subStr(reg), RegistryDTO.class); //创建对象
+            return Result.ok(result);
+        } catch (Exception e) {
+            return Result.error(CodeConstants.CREATE_ERROR_NAME_OUT_OF_LEN);
+        }
     }
 }
