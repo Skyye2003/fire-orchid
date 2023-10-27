@@ -5,9 +5,9 @@ import lombok.Data;
 @Data
 public class WriteFileDTO {
     /**
-     * 写文件的id
+     * 写文件的起始盘块号
      */
-    private Integer fileId;
+    private Integer fileStartId;
     /**
      * 需要写入的数据
      */

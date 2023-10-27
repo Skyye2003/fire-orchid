@@ -10,12 +10,12 @@ public class ChangeFileDTO {
     /**
      * 需要更改文件的目录盘块号
      */
-    private Integer curDiskId;
+    private Integer diskId;
 
     /**
      * 需要更改文件的盘块号
      */
-    private Integer curFileId;
+    private Integer startId;
 
     /**
      * 原始的文件名(含后缀)，不是文件路径
