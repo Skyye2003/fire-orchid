@@ -234,9 +234,9 @@ public class FileServiceImpl implements IFileService {
 
 
     public Result<FileInfoDTO> writeFile(WriteFileDTO writeFileDTO) {
-        Integer fileId = writeFileDTO.getFileId();
+        Integer fileStartId = writeFileDTO.getFileStartId();
         String data = writeFileDTO.getData();
-        FileInfo fileInfo = fileInfoMapper.selectByPrimaryKey(fileId); //根据文件id获取fileInfo
+        FileInfo fileInfo = fileInfoMapper.selectByStartId(fileStartId); //根据文件起始盘块号获取fileInfo对象
         Integer currentBlock = fileInfo.getWriteDnum(); //获取写文件的盘块号
         Integer writePointer = fileInfo.getWriteBnum(); //获取文件的写指针位置（当前磁盘的第几字节）
         Integer fileLength = fileInfo.getSize(); //获取文件当前长度（占用的磁盘块数）
@@ -284,15 +284,15 @@ public class FileServiceImpl implements IFileService {
      * @return 结果
      */
     public Result<RegistryDTO> change (ChangeFileDTO changeFileDTO) {
-        Integer curDiskId = changeFileDTO.getCurDiskId(); //当前文件的目录盘块号
-        Integer curFileId = changeFileDTO.getCurFileId(); //当前文件盘块号
+        Integer diskId = changeFileDTO.getDiskId(); //当前文件的目录盘块号
+        Integer startId = changeFileDTO.getStartId(); //当前文件起始盘块号
         String oldName = changeFileDTO.getOldName();
         String newName = changeFileDTO.getNewName();
         String type = changeFileDTO.getType();
         Integer attribute = changeFileDTO.getAttribute();
-        FileInfo fileInfo = fileInfoMapper.selectByPrimaryKey(curFileId); //根据文件id获取fileInfo
+        FileInfo fileInfo = fileInfoMapper.selectByStartId(startId); //根据文件起始盘块号获取fileInfo对象
 
-        DiskContent curDisk = diskContentMapper.selectByPrimaryKey(curDiskId); //获取当前盘块
+        DiskContent curDisk = diskContentMapper.selectByPrimaryKey(diskId); //获取当前盘块
         String curDiskContent = curDisk.getContent(); //当前盘块内容
         String[] contentSplit = curDiskContent.split("/"); //分割出各个登记项
 
@@ -301,7 +301,7 @@ public class FileServiceImpl implements IFileService {
         change[1] = StrUtils.fillStr(change[1],' ',2,false); //填充后缀
 
         try {
-            String reg = StrUtils.generateFileReg(newName, type, attribute, curDiskId); //生成更改后的登记项
+            String reg = StrUtils.generateFileReg(newName, type, attribute, diskId); //生成更改后的登记项
             String newContent = "";
             for (String content : contentSplit) { //搜索匹配的登记项
                 if (content.substring(0,5).equals(change[0] + change[1])) { //匹配到则替换为新的登记项

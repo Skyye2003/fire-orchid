@@ -19,4 +19,6 @@ public interface FileInfoMapper extends BaseMapper<FileInfo> {
     int updateByPrimaryKeySelective(FileInfo row);
 
     int updateByPrimaryKey(FileInfo row);
+
+    FileInfo selectByStartId(Integer startId);
 }

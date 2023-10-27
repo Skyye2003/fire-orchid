@@ -23,6 +23,12 @@
     from file_info
     where id = #{id,jdbcType=INTEGER}
   </select>
+  <select id="selectByStartId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from file_info
+    where start_id = #{startId, jdbcType=INTEGER}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from file_info
     where id = #{id,jdbcType=INTEGER}
