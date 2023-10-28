@@ -283,7 +283,7 @@ public class FileServiceImpl implements IFileService {
      * @param changeFileDTO 更改的文件对象
      * @return 结果
      */
-    public Result<RegistryDTO> change (ChangeFileDTO changeFileDTO) {
+    public Result<FileInfoDTO> change (ChangeFileDTO changeFileDTO) {
         Integer diskId = changeFileDTO.getDiskId(); //当前文件的目录盘块号
         Integer startId = changeFileDTO.getStartId(); //当前文件起始盘块号
         String oldName = changeFileDTO.getOldName();
@@ -299,6 +299,12 @@ public class FileServiceImpl implements IFileService {
         String[] change = oldName.split("\\."); //分割名称、后缀
         change[0] = StrUtils.fillStr(change[0],' ',3,false); //填充名称
         change[1] = StrUtils.fillStr(change[1],' ',2,false); //填充后缀
+
+        for (String content : contentSplit) {
+            if (content.substring(0, 5).equals(newName + type)) {
+                return Result.error(CodeConstants.RENAME_ERROR_CONFLICT);
+            }
+        }
 
         try {
             String reg = StrUtils.generateFileReg(newName, type, attribute, diskId); //生成更改后的登记项
@@ -329,9 +335,7 @@ public class FileServiceImpl implements IFileService {
             curDisk.setContent(newContent);
             diskContentMapper.updateByPrimaryKey(curDisk); //更新盘块登记项
 
-            RegistryDTO result = (RegistryDTO)ParseUtils.parseAttribute(
-                    StrUtils.subStr(reg), RegistryDTO.class); //创建对象
-            return Result.ok(result);
+            return Result.ok(new FileInfoDTO(fileInfo, handleContent(fileInfo)));
         } catch (Exception e) {
             return Result.error(CodeConstants.CREATE_ERROR_NAME_OUT_OF_LEN);
         }

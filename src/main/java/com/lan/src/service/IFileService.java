@@ -17,5 +17,5 @@ public interface IFileService {
 
     Result<FileInfoDTO> writeFile(WriteFileDTO writeFileDTO);
 
-    Result<RegistryDTO> change(ChangeFileDTO changeFileDTO);
+    Result<FileInfoDTO> change(ChangeFileDTO changeFileDTO);
 }

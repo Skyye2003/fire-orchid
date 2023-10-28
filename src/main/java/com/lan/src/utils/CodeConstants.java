@@ -41,4 +41,8 @@ public class CodeConstants {
      * 只读文件写打开
      */
     public static final String OPEN_ERROR_TYPE = "40011: 只读写打开!";
+    /**
+     * 文件名称重复
+     */
+    public static final String RENAME_ERROR_CONFLICT = "50010: 文件名称已存在！";
 }
