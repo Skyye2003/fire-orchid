@@ -70,7 +70,7 @@ public class FileController {
     }
 
     @PostMapping("/change")
-    public Result<RegistryDTO> changeFile(@RequestBody ChangeFileDTO changeFileDTO) {
+    public Result<FileInfoDTO> changeFile(@RequestBody ChangeFileDTO changeFileDTO) {
         return fileService.change(changeFileDTO);
     }
 }
