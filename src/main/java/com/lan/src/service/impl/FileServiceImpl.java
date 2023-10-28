@@ -307,7 +307,7 @@ public class FileServiceImpl implements IFileService {
         }
 
         try {
-            String reg = StrUtils.generateFileReg(newName, type, attribute, diskId); //生成更改后的登记项
+            String reg = StrUtils.generateFileReg(newName, type, attribute, startId); //生成更改后的登记项
             String newContent = "";
             for (String content : contentSplit) { //搜索匹配的登记项
                 if (content.substring(0,5).equals(change[0] + change[1])) { //匹配到则替换为新的登记项
